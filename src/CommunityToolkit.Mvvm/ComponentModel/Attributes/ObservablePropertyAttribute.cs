@@ -54,4 +54,15 @@ namespace CommunityToolkit.Mvvm.ComponentModel;
 [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = false)]
 public sealed class ObservablePropertyAttribute : Attribute
 {
+    /// <summary>
+    /// Defines the accessibility of the setter.
+    /// </summary>
+    public readonly SetterAccessibility SetterAccessibility;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ObservablePropertyAttribute"/> class.
+    /// </summary>
+    /// <param name="setterAccessibility">Setter accessibility. Defaults to <see cref="SetterAccessibility.Private"/>.</param>
+    public ObservablePropertyAttribute(SetterAccessibility setterAccessibility = SetterAccessibility.Private) =>
+        this.SetterAccessibility = setterAccessibility;
 }

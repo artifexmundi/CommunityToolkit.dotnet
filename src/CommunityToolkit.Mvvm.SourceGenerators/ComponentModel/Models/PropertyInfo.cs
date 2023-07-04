@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using CommunityToolkit.Mvvm.SourceGenerators.Helpers;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace CommunityToolkit.Mvvm.SourceGenerators.ComponentModel.Models;
 
@@ -21,6 +22,7 @@ namespace CommunityToolkit.Mvvm.SourceGenerators.ComponentModel.Models;
 /// <param name="IsReferenceTypeOrUnconstraindTypeParameter">Indicates whether the property is of a reference type or an unconstrained type parameter.</param>
 /// <param name="IncludeMemberNotNullOnSetAccessor">Indicates whether to include nullability annotations on the setter.</param>
 /// <param name="ForwardedAttributes">The sequence of forwarded attributes for the generated property.</param>
+/// <param name="SetterAccessibility">Setter accessibility.</param>
 internal sealed record PropertyInfo(
     string TypeNameWithNullabilityAnnotations,
     string FieldName,
@@ -33,4 +35,5 @@ internal sealed record PropertyInfo(
     bool IsOldPropertyValueDirectlyReferenced,
     bool IsReferenceTypeOrUnconstraindTypeParameter,
     bool IncludeMemberNotNullOnSetAccessor,
-    EquatableArray<AttributeInfo> ForwardedAttributes);
+    EquatableArray<AttributeInfo> ForwardedAttributes,
+    SyntaxKind SetterAccessibility);

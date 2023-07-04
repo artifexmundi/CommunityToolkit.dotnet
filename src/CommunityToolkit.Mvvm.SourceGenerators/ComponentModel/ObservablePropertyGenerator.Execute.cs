@@ -296,6 +296,18 @@ partial class ObservablePropertyGenerator
 
             token.ThrowIfCancellationRequested();
 
+            AttributeData observablePropertyData = fieldSymbol.GetAttributes()
+                .First(attribute => attribute.AttributeClass?.HasFullyQualifiedMetadataName("CommunityToolkit.Mvvm.ComponentModel.ObservablePropertyAttribute") ?? false);
+
+            TypedConstant? constructorArgument = observablePropertyData.ConstructorArguments.FirstOrDefault();
+            SyntaxKind setterAccessibility = constructorArgument switch
+            {
+                { Value: 0 } => SyntaxKind.PublicKeyword,
+                { Value: 1 } => SyntaxKind.ProtectedKeyword,
+                { Value: 2 } => SyntaxKind.InternalKeyword,
+                _ => SyntaxKind.PrivateKeyword
+            };
+            
             propertyInfo = new PropertyInfo(
                 typeNameWithNullabilityAnnotations,
                 fieldName,
@@ -308,7 +320,8 @@ partial class ObservablePropertyGenerator
                 isOldPropertyValueDirectlyReferenced,
                 isReferenceTypeOrUnconstraindTypeParameter,
                 includeMemberNotNullOnSetAccessor,
-                forwardedAttributes.ToImmutable());
+                forwardedAttributes.ToImmutable(),
+                setterAccessibility);
 
             diagnostics = builder.ToImmutable();
 
@@ -991,11 +1004,16 @@ partial class ObservablePropertyGenerator
 
             // Prepare the setter for the generated property:
             //
-            // set
+            // <SETTER_ACCESSIBILITY> set
             // {
             //     <BODY>
             // }
             AccessorDeclarationSyntax setAccessor = AccessorDeclaration(SyntaxKind.SetAccessorDeclaration).WithBody(Block(setterIfStatement));
+
+            if (propertyInfo.SetterAccessibility != SyntaxKind.PublicKeyword)
+            {
+                setAccessor = setAccessor.WithModifiers(TokenList(Token(propertyInfo.SetterAccessibility)));
+            }
 
             // Add the [MemberNotNull] attribute if needed:
             //
